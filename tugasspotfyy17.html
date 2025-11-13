@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Musicfy - Pink Love</title>
+
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet"/>
+
+  <style>
+    :root {
+      --pink-bg: #fdf2f5;
+      --pink-light: #f9bec7;
+      --pink-accent: #e91e63;
+      --pink-soft: #fce4ec;
+      --dark: #121212;
+      --gray-dark: #282828;
+      --gray-light: #b3b3b3;
+      --white: #ffffff;
+    }
+
+    * {
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background-color: var(--dark);
+      color: var(--white);
+      min-height: 100vh;
+      padding-bottom: 90px;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 240px;
+      height: 100vh;
+      background: black;
+      padding: 20px;
+      overflow-y: auto;
+      z-index: 1000;
+    }
+
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: var(--pink-accent);
+      margin-bottom: 2rem;
+    }
+
+    .nav-link {
+      color: var(--gray-light) !important;
+      padding: 0.75rem 0;
+      border-radius: 8px;
+      transition: all 0.2s;
+      font-weight: 600;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      color: white !important;
+      background-color: var(--gray-dark);
+    }
+
+    .nav-link i {
+      width: 24px;
+      margin-right: 12px;
+    }
+
+    /* Main Content */
+    .main-content {
+      margin-left: 240px;
+      min-height: 100vh;
+      background: linear-gradient(to bottom, var(--pink-light) 0%, var(--dark) 30%);
+      padding-top: 80px;
+    }
+
+    /* Top Navigation */
+    .top-nav {
+      position: fixed;
+      top: 0;
+      left: 240px;
+      right: 0;
+      background: rgba(18, 18, 18, 0.85);
+      backdrop-filter: blur(12px);
+      padding: 1rem 2rem;
+      z-index: 999;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .search-bar {
+      background: rgba(255, 255, 255, 0.15);
+      border: none;
+      border-radius: 500px;
+      padding: 0.5rem 1rem;
+      color: white;
+      width: 360px;
+    }
+
+    .search-bar::placeholder {
+      color: #ccc;
+    }
+
+    .user-profile {
+      width: 38px;
+      height: 38px;
+      background: var(--pink-accent);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+
+    /* Playlist Header */
+    .playlist-header {
+      padding: 2rem;
+      display: flex;
+      align-items: flex-end;
+      gap: 1.5rem;
+    }
+
+    .playlist-cover {
+      width: 232px;
+      height: 232px;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+      position: relative;
+      cursor: pointer;
+    }
+
+    .playlist-cover img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .cover-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .playlist-cover:hover .cover-overlay {
+      opacity: 1;
+    }
+
+    .cover-overlay i {
+      font-size: 2.5rem;
+      color: white;
+    }
+
+    .playlist-title {
+      font-size: 4.5rem;
+      font-weight: 900;
+      margin: 0;
+    }
+
+    .playlist-meta {
+      color: var(--gray-light);
+      font-size: 0.95rem;
+      margin-top: 0.5rem;
+    }
+
+    /* Song List */
+    .song-list {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      margin: 0 2rem 3rem;
+      overflow: hidden;
+    }
+
+    .song-header {
+      padding: 0.75rem 1.5rem;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      font-size: 0.8rem;
+      color: var(--gray-light);
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .song-item {
+      padding: 0.75rem 1.5rem;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      transition: background 0.2s;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+    }
+
+    .song-item:hover, .song-item.playing {
+      background: rgba(255,255,255,0.1);
+    }
+
+    .song-number {
+      width: 40px;
+      text-align: center;
+      color: var(--gray-light);
+      font-size: 1rem;
+    }
+
+    .song-img {
+      width: 40px;
+      height: 40px;
+      border-radius: 4px;
+      object-fit: cover;
+      cursor: pointer;
+    }
+
+    .song-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: text;
+    }
+
+    .song-artist {
+      color: var(--gray-light);
+      font-size: 0.85rem;
+    }
+
+    .song-duration {
+      color: var(--gray-light);
+      font-size: 0.85rem;
+    }
+
+    /* Player Bottom */
+    .player {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 84px;
+      background: linear-gradient(to top, #1a1a1a, #000);
+      border-top: 1px solid #333;
+      display: flex;
+      align-items: center;
+      padding: 0 1rem;
+      z-index: 1001;
+    }
+
+    .player-left {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .player-cover {
+      width: 56px;
+      height: 56px;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+
+    .player-cover img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .player-info h6 {
+      margin: 0;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .player-info p {
+      margin: 0;
+      font-size: 0.8rem;
+      color: var(--gray-light);
+    }
+
+    .player-center {
+      flex: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .player-controls {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .player-btn {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.3rem;
+      transition: all 0.2s;
+    }
+
+    .player-btn:hover {
+      color: var(--pink-accent);
+      transform: scale(1.1);
+    }
+
+    .play-pause-btn {
+      background: white;
+      color: var(--dark);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      transition: all 0.2s;
+    }
+
+    .play-pause-btn:hover {
+      transform: scale(1.1);
+    }
+
+    .progress-container {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.75rem;
+      color: var(--gray-light);
+    }
+
+    .progress-bar {
+      flex: 1;
+      height: 4px;
+      background: #404040;
+      border-radius: 2px;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .progress {
+      width: 0%;
+      height: 100%;
+      background: white;
+      border-radius: 2px;
+      position: relative;
+      transition: width 0.1s linear;
+    }
+
+    .progress::after {
+      content: '';
+      position: absolute;
+      right: -6px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 12px;
+      height: 12px;
+      background: white;
+      border-radius: 50%;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .progress-bar:hover .progress::after {
+      opacity: 1;
+    }
+
+    .player-right {
+      flex: 1;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .volume-container {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      width: 100px;
+    }
+
+    .volume-bar {
+      flex: 1;
+      height: 4px;
+      background: #404040;
+      border-radius: 2px;
+      cursor: pointer;
+    }
+
+    .volume {
+      width: 70%;
+      height: 100%;
+      background: white;
+      border-radius: 2px;
+      position: relative;
+    }
+
+    .volume::after {
+      content: '';
+      position: absolute;
+      right: -6px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 12px;
+      height: 12px;
+      background: white;
+      border-radius: 50%;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .volume-bar:hover .volume::after {
+      opacity: 1;
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+      .sidebar { width: 80px; padding: 15px; }
+      .sidebar .logo, .sidebar .nav-text { display: none; }
+      .main-content, .top-nav { margin-left: 80px; }
+      .search-bar { width: 200px; }
+    }
+
+    @media (max-width: 768px) {
+      .player-left .d-none { display: none; }
+      .player-right { display: none; }
+      .player-center { flex: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="logo">Musicfy</div>
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a href="#" class="nav-link active">
+          <i class="bi bi-house-door-fill"></i>
+          <span class="nav-text">Beranda</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="#" class="nav-link">
+          <i class="bi bi-search"></i>
+          <span class="nav-text">Cari</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="#" class="nav-link">
+          <i class="bi bi-collection-play"></i>
+          <span class="nav-text">Koleksi Anda</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Top Navigation -->
+    <div class="top-nav">
+      <div class="d-flex align-items-center gap-3">
+        <button class="btn btn-dark rounded-circle p-2"><i class="bi bi-chevron-left"></i></button>
+        <button class="btn btn-dark rounded-circle p-2"><i class="bi bi-chevron-right"></i></button>
+        <input type="text" class="form-control search-bar" placeholder="Cari lagu...">
+      </div>
+      <div class="d-flex align-items-center gap-3">
+        <div class="user-profile">U</div>
+      </div>
+    </div>
+
+    <!-- Playlist Header -->
+    <div class="playlist-header">
+      <div class="playlist-cover" id="playlistCoverContainer">
+        <img id="playlistCover" src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Pink Love">
+        <div class="cover-overlay">
+          <i class="bi bi-camera-fill"></i>
+        </div>
+      </div>
+      <div>
+        <p class="text-uppercase fw-bold text-white-50 mb-1">Playlist</p>
+        <h1 class="playlist-title">GALAU VIBES</h1>
+        <p class="playlist-meta">Dibuat oleh <strong>syiva silfia</strong> • 6 lagu</p>
+      </div>
+    </div>
+
+    <!-- Song List -->
+    <div class="song-list">
+      <div class="song-header d-none d-lg-flex">
+        <div class="col-1">#</div>
+        <div class="col-5">JUDUL</div>
+        <div class="col-3">ARTIS</div>
+        <div class="col-2">DITAMBAHKAN</div>
+        <div class="col-1 text-center"><i class="bi bi-clock"></i></div>
+      </div>
+
+      <div id="song-container"></div>
+    </div>
+  </div>
+
+  <!-- Audio Element -->
+  <audio id="audio" preload="auto"></audio>
+
+  <!-- Hidden Inputs -->
+  <input type="file" id="playlistCoverInput" accept="image/*" style="display: none;">
+  <input type="file" id="songCoverInput" accept="image/*" style="display: none;">
+
+  <!-- Player Bottom -->
+  <div class="player">
+    <div class="player-left">
+      <div class="player-cover">
+        <img id="playerCover" src="" alt="Cover">
+      </div>
+      <div class="player-info">
+        <h6 id="playerTitle">Kasih Putih</h6>
+        <p id="playerArtist">Glenn Fredly</p>
+      </div>
+    </div>
+
+    <div class="player-center">
+      <div class="player-controls">
+        <button class="player-btn" id="prevBtn"><i class="bi bi-skip-start-fill"></i></button>
+        <button class="play-pause-btn" id="playPauseBtn">
+          <i class="bi bi-pause-fill"></i>
+        </button>
+        <button class="player-btn" id="nextBtn"><i class="bi bi-skip-end-fill"></i></button>
+      </div>
+      <div class="progress-container">
+        <span id="currentTime">0:00</span>
+        <div class="progress-bar" id="progressBar">
+          <div class="progress" id="progress"></div>
+        </div>
+        <span id="duration">0:00</span>
+      </div>
+    </div>
+
+    <div class="player-right d-none d-lg-flex">
+      <div class="volume-container">
+        <i class="bi bi-volume-up text-white" id="volumeIcon"></i>
+        <div class="volume-bar" id="volumeBar">
+          <div class="volume" id="volume"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // 10 Lagu Indonesia
+    let songs = [
+      { title: "Kasih Putih", artist: "Glenn Fredly", duration: "4:12", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3", cover: "https://images.unsplash.com/photo-1614149162883-504ce4d13909?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" },
+      { title: "Monolong", artist: "Rizky Febian", duration: "3:45", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3", cover: "https://images.unsplash.com/photo-1500099817043-86d46000d58f?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" },
+      { title: "Rahasia Hati", artist: "Nidji", duration: "4:01", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3", cover: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" },
+  
+      { title: "Staying", artist: "Kodaline", duration: "3:35", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3", cover: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" },
+      { title: "Sailor Songs", artist: "Original", duration: "3:20", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3", cover: "https://images.unsplash.com/photo-1501612780327-45045538702b?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" },
+    
+
+      { title: "Lesung Pipi", artist: "Bunga Citra Lestari", duration: "3:55", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3", cover: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" },
+    ];
+
+    // Elemen
+    const audio = document.getElementById('audio');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const progressBar = document.getElementById('progressBar');
+    const progress = document.getElementById('progress');
+    const currentTimeEl = document.getElementById('currentTime');
+    const durationEl = document.getElementById('duration');
+    const playerTitle = document.getElementById('playerTitle');
+    const playerArtist = document.getElementById('playerArtist');
+    const playerCover = document.getElementById('playerCover');
+    const playlistCover = document.getElementById('playlistCover');
+    const playlistCoverContainer = document.getElementById('playlistCoverContainer');
+    const playlistCoverInput = document.getElementById('playlistCoverInput');
+    const songCoverInput = document.getElementById('songCoverInput');
+    const volumeBar = document.getElementById('volumeBar');
+    const volume = document.getElementById('volume');
+    const volumeIcon = document.getElementById('volumeIcon');
+    const songContainer = document.getElementById('song-container');
+
+    let currentSongIndex = 0;
+    let isPlaying = false;
+
+    // Format waktu
+    function formatTime(seconds) {
+      const mins = Math.floor(seconds / 60);
+      const secs = Math.floor(seconds % 60);
+      return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    }
+
+    // Load lagu
+    function loadSong(index) {
+      const song = songs[index];
+      audio.src = song.src;
+      playerTitle.textContent = song.title;
+      playerArtist.textContent = song.artist;
+      playerCover.src = song.cover;
+      playlistCover.src = song.cover;
+
+      document.querySelectorAll('.song-item').forEach((item, i) => {
+        item.classList.toggle('playing', i === index);
+      });
+
+      audio.load();
+    }
+
+    // Play/Pause
+    function togglePlay() {
+      if (isPlaying) {
+        audio.pause();
+        playPauseBtn.innerHTML = '<i class="bi bi-play-fill"></i>';
+      } else {
+        audio.play();
+        playPauseBtn.innerHTML = '<i class="bi bi-pause-fill"></i>';
+      }
+      isPlaying = !isPlaying;
+    }
+
+    // Next/Prev
+    function nextSong() {
+      currentSongIndex = (currentSongIndex + 1) % songs.length;
+      loadSong(currentSongIndex);
+      if (isPlaying) audio.play();
+    }
+
+    function prevSong() {
+      currentSongIndex = (currentSongIndex - 1 + songs.length) % songs.length;
+      loadSong(currentSongIndex);
+      if (isPlaying) audio.play();
+    }
+
+    // Ganti Cover Playlist
+    playlistCoverContainer.addEventListener('click', () => {
+      playlistCoverInput.click();
+    });
+
+    playlistCoverInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const url = ev.target.result;
+          playlistCover.src = url;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Render daftar lagu
+    function renderSongs() {
+      songContainer.innerHTML = '';
+      songs.forEach((song, index) => {
+        const item = document.createElement('div');
+        item.className = 'song-item';
+        item.innerHTML = `
+          <div class="song-number">${index + 1}</div>
+          <div class="d-flex align-items-center gap-3 flex-fill">
+            <img src="${song.cover}" alt="${song.title}" class="song-img" data-index="${index}">
+            <div>
+              <div class="song-title" contenteditable="true" data-index="${index}">${song.title}</div>
+              <div class="song-artist">${song.artist}</div>
+            </div>
+          </div>
+          <div class="d-none d-lg-block col-3 text-muted">Lagu Cinta</div>
+          <div class="d-none d-lg-block col-2 text-muted">Hari ini</div>
+          <div class="song-duration text-end">${song.duration}</div>
+        `;
+        item.addEventListener('click', (e) => {
+          if (!e.target.isContentEditable && e.target.tagName !== 'IMG') {
+            currentSongIndex = index;
+            loadSong(index);
+            togglePlay();
+          }
+        });
+        songContainer.appendChild(item);
+      });
+
+      // Edit judul
+      document.querySelectorAll('.song-title[contenteditable]').forEach(el => {
+        el.addEventListener('blur', () => {
+          const index = el.dataset.index;
+          songs[index].title = el.textContent.trim();
+          if (currentSongIndex == index) playerTitle.textContent = songs[index].title;
+        });
+      });
+
+      // Ganti foto lagu
+      document.querySelectorAll('.song-img').forEach(img => {
+        img.addEventListener('click', (e) => {
+          e.stopPropagation();
+          songCoverInput.dataset.index = img.dataset.index;
+          songCoverInput.click();
+        });
+      });
+    }
+
+    songCoverInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      const index = e.target.dataset.index;
+      if (file && index !== undefined) {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const url = ev.target.result;
+          songs[index].cover = url;
+          document.querySelectorAll(`.song-img[data-index="${index}"]`)[0].src = url;
+          if (currentSongIndex == index) {
+            playerCover.src = url;
+            playlistCover.src = url;
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Event Listeners
+    playPauseBtn.addEventListener('click', togglePlay);
+    nextBtn.addEventListener('click', nextSong);
+    prevBtn.addEventListener('click', prevSong);
+
+    audio.addEventListener('loadedmetadata', () => {
+      durationEl.textContent = formatTime(audio.duration);
+    });
+
+    audio.addEventListener('timeupdate', () => {
+      const percent = (audio.currentTime / audio.duration) * 100;
+      progress.style.width = percent + '%';
+      currentTimeEl.textContent = formatTime(audio.currentTime);
+    });
+
+    audio.addEventListener('ended', nextSong);
+
+    progressBar.addEventListener('click', (e) => {
+      const rect = progressBar.getBoundingClientRect();
+      const pos = (e.clientX - rect.left) / rect.width;
+      audio.currentTime = pos * audio.duration;
+    });
+
+    volumeBar.addEventListener('click', (e) => {
+      const rect = volumeBar.getBoundingClientRect();
+      const pos = (e.clientX - rect.left) / rect.width;
+      const newVolume = Math.max(0, Math.min(1, pos));
+      audio.volume = newVolume;
+      volume.style.width = (newVolume * 100) + '%';
+      volumeIcon.className = newVolume === 0 ? 'bi bi-volume-mute text-white' : newVolume < 0.5 ? 'bi bi-volume-down text-white' : 'bi bi-volume-up text-white';
+    });
+
+    // Init
+    renderSongs();
+    loadSong(0);
+    audio.volume = 0.7;
+    volume.style.width = '70%';
+  </script>
+</body>
+</html>
